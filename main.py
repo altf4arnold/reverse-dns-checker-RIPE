@@ -2,6 +2,7 @@
 Script written by Arnold DECHAMPS for the RIPE LABS article :
 """
 import io, re
+import dns.resolver
 
 
 def filemanager():
@@ -42,21 +43,39 @@ def statmaker(sorteddata):
     """
     makes statistics on the objects
     :param sorteddata:
+    :return int with non-dnssec objects
     """
-    totalobjects = len(sorteddata)
     dnssecenabled = 0
     for object in sorteddata:
         if len(object["dnssec"]) > 0:
             dnssecenabled += 1
-    print("DNSSec configuration is :  " + str(dnssecenabled) + "/" + str(totalobjects) + " total objects.")
+    return dnssecenabled
 
-
+def dnstester(sorteddata):
+    """
+    Takes the data and tests the DNS servers
+    """
+    working = 0
+    for object in sorteddata:
+        try:
+            dns.resolver.resolve(object["domain"], "SOA")
+            working += 1
+        except Exception as e:
+            print(e)
+            print(object["domain"] + " Not Working !")
+    return working
 def main():
     """
     main function
     :nothing:
     """
-    statmaker(sorter(filemanager()))
+    data = sorter(filemanager())
+    dnssec = statmaker(data)
+    operational = dnstester(data)
+    print("These are the test results :")
+    print("Total amount of objects      : " + str(len(data)))
+    print("Total amount of working ones : " + str(operational))
+    print("Total with DNSSEC enabled    : " + str(dnssec))
 
 if __name__ == '__main__':
     main()
