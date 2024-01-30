@@ -6,6 +6,8 @@ To execute it, you will need to download [this file](https://ftp.ripe.net/ripe/d
 daily dump of all the RIPE-NCC domain objects and decompress it at the root of the project.
 
 ```bash
+wget https://ftp.ripe.net/ripe/dbase/split/ripe.db.domain.gz
+gunzip ripe.db.domain.gz
 virtualenv -p pyhton3 venv
 source venv/bin/activate
 python main.py
