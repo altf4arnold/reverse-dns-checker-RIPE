@@ -10,6 +10,7 @@ wget https://ftp.ripe.net/ripe/dbase/split/ripe.db.domain.gz
 gunzip ripe.db.domain.gz
 virtualenv -p python3 venv
 source venv/bin/activate
+pip install requirements.txt
 python main.py
 ```
 
