@@ -2,7 +2,10 @@
 Script written by Arnold DECHAMPS for the RIPE LABS article :
 """
 import io, re
-import dns.resolver
+import asyncio
+from async_dns.core import types, Address
+from async_dns.resolver import DNSClient
+
 
 
 def filemanager():
@@ -14,6 +17,8 @@ def filemanager():
     rawlines = dbobjects.readlines()
     for i in range(len(rawlines)):
         rawlines[i] = rawlines[i].strip("\n")
+    dbobjects.close()
+    print("File read.")
     return rawlines
 
 
@@ -37,9 +42,10 @@ def sorter(rawlines):
             dns.append(line.replace("nserver:        ",""))
         elif re.match(r'^\s*ds-rdata:', line) is not None:
             dnssec.append(line.replace("ds-rdata:       ",""))
+    print("File sorted")
     return objects
 
-def statmaker(sorteddata):
+def dnssecstatmaker(sorteddata):
     """
     makes statistics on the objects
     :param sorteddata:
@@ -49,7 +55,15 @@ def statmaker(sorteddata):
     for object in sorteddata:
         if len(object["dnssec"]) > 0:
             dnssecenabled += 1
+    print("DNSSEC adoption calculated")
     return dnssecenabled
+
+async def query(domain, address):
+    client = DNSClient()
+    res = await client.query(domain, types.SOA,Address.parse(address, allow_domain=True))
+    print(res)
+    # print(res.aa)
+
 
 def dnstester(sorteddata):
     """
@@ -58,19 +72,21 @@ def dnstester(sorteddata):
     working = 0
     for object in sorteddata:
         try:
-            dns.resolver.resolve(object["domain"], "SOA")
+            asyncio.run(query(object["domain"],object["nameserver"][0]))
             working += 1
         except Exception as e:
-            print(e)
-            print(object["domain"] + " Not Working !")
+            print(object["domain"] + " Not Working !" + str(e))
+
     return working
+
+
 def main():
     """
     main function
     :nothing:
     """
     data = sorter(filemanager())
-    dnssec = statmaker(data)
+    dnssec = dnssecstatmaker(data)
     operational = dnstester(data)
     print("These are the test results :")
     print("Total amount of objects      : " + str(len(data)))
