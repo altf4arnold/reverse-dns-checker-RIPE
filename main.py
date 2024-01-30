@@ -32,11 +32,11 @@ def sorter(rawlines):
                 objects.append({"domain": domain, "nameserver": dns, "dnssec": dnssec})
                 dnssec = []
                 dns = []
-            domain = line.lstrip("domain:         ")
+            domain = line.replace("domain:         ","")
         elif re.match(r'^\s*nserver:', line) is not None:
-            dns.append(line.lstrip("nserver:        "))
+            dns.append(line.replace("nserver:        ",""))
         elif re.match(r'^\s*ds-rdata:', line) is not None:
-            dnssec.append(line.lstrip("ds-rdata:       "))
+            dnssec.append(line.replace("ds-rdata:       ",""))
     return objects
 
 def statmaker(sorteddata):
