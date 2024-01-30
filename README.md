@@ -8,7 +8,7 @@ daily dump of all the RIPE-NCC domain objects and decompress it at the root of t
 ```bash
 wget https://ftp.ripe.net/ripe/dbase/split/ripe.db.domain.gz
 gunzip ripe.db.domain.gz
-virtualenv -p pyhton3 venv
+virtualenv -p python3 venv
 source venv/bin/activate
 python main.py
 ```
