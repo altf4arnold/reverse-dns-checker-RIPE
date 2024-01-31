@@ -104,6 +104,7 @@ def dnstester(sorteddata):
         status += 1
         if status == len(sorteddata):
             working = working + asyncio.run(dnstest(queries))
+            print("done")
     return working
 
 
