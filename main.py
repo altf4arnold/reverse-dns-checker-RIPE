@@ -102,6 +102,8 @@ def dnstester(sorteddata):
             runs += 1
             queries.append((object["domain"], "SOA"))
         status += 1
+        if status == len(sorteddata):
+            working = working + asyncio.run(dnstest(queries))
     return working
 
 
