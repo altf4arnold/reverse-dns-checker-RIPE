@@ -1,2 +1,10 @@
+async-dns==2.0.0
+build==1.0.3
+click==8.1.7
 dnspython==2.5.0
+packaging==23.2
 pip-tools==7.3.0
+pyproject_hooks==1.0.0
+setuptools==69.0.3
+tomli==2.0.1
+wheel==0.42.0
