@@ -92,14 +92,15 @@ def dnstester(sorteddata):
     runs = 0
     status = 0
     for object in sorteddata:
-        queries.append((object["domain"], "SOA"))
         if runs == 10000:
             runs = 0
             working = working + asyncio.run(dnstest(queries))
             print("object : " + str(status))
             queries = []
+            queries.append((object["domain"], "SOA"))
         else:
             runs += 1
+            queries.append((object["domain"], "SOA"))
         status += 1
     return working
 
