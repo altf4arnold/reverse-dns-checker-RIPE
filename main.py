@@ -18,6 +18,7 @@ def filemanager():
     rawlines = dbobjects.readlines()
     for i in range(len(rawlines)):
         rawlines[i] = rawlines[i].strip("\n")
+    print("File reading done.")
     return rawlines
 
 
@@ -41,6 +42,7 @@ def sorter(rawlines):
             dns.append(line.replace("nserver:        ", ""))
         elif re.match(r'^\s*ds-rdata:', line) is not None:
             dnssec.append(line.replace("ds-rdata:       ", ""))
+    print("File sorted.")
     return objects
 
 
@@ -54,6 +56,7 @@ def statmaker(sorteddata):
     for object in sorteddata:
         if len(object["dnssec"]) > 0:
             dnssecenabled += 1
+    print("DNSSEC stats done.")
     return dnssecenabled
 
 
@@ -75,8 +78,6 @@ async def dnstest(queries):
     res = await dns_bulk(*queries)
     for i, a in enumerate(res):
         if isinstance(a, Exception):
-            print(
-                f" [!!!] Error: Result {i} is an exception! Original query: {queries[i]} || Exception is: {type(a)} - {a!s} \n")
             continue
         else:
             success += 1
@@ -91,11 +92,12 @@ def dnstester(sorteddata):
     working = 0
     runs = 0
     status = 0
+    total = len(sorteddata)
     for object in sorteddata:
-        if runs == 10000:
+        if runs == 1000:
             runs = 0
             working = working + asyncio.run(dnstest(queries))
-            print("object : " + str(status))
+            print("status : " + str(status) + "/" + str(total))
             queries = []
             queries.append((object["domain"], "SOA"))
         else:
@@ -104,7 +106,7 @@ def dnstester(sorteddata):
         status += 1
         if status == len(sorteddata):
             working = working + asyncio.run(dnstest(queries))
-            print("done")
+            print("status : " + str(status) + "/" + str(total))
     return working
 
 
